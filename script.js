@@ -30,6 +30,10 @@ function renderMineField(m,n,mineNums) {
             let cellEI = document.createElement('div');
             
             cellEI.className = "cell";
+
+            cellEI.onclick = function() {
+                handleClick(i,j,cells,m,n);
+            }
             
             tdEI.append(cellEI);
 
@@ -69,32 +73,33 @@ let direction = [
 ]
 
 function checkAmbedianMineCounts(cells,m,n) {
-    for (let i = 0; i < m; i++) {
-        for (let j = 0; j < n; j++) {
-            let cell = cells[i][j];
+    for (let rowIdx = 0; rowIdx < m; rowIdx++) {
+        for (let colIdx = 0; colIdx < n; colIdx++) {
+            let cell = cells[rowIdx][colIdx];
             if (cell.mined) {
                 continue
             }
-            let minedcount = 0;
-            for (let [dx,dy] of direction) {
-                let newRowIdx = i + dx, newColIdx = j + dy;
+            let minecount = 0;
+            for (let [drow,dcol] of direction) {
+                let newRowIdx = rowIdx + drow, newColIdx = colIdx + dcol;
                 if (newRowIdx < 0 || newRowIdx >= m ||
                     newColIdx < 0 || newColIdx >= n ) {
                     continue
                 }
                 if (cells[newRowIdx][newColIdx].mined) {
-                    minedcount += 1;
+                    minecount += 1;
                 }
             }
-            if (minedcount > 0) {
+            if (minecount > 0) {
                 let countSpan  = document.createElement('span');
                 countSpan.className = "mine-count";
-                countSpan.innerText = `${minedcount}`;
+                countSpan.innerText = `${minecount}`;
 
-                countSpan.classList.add(`n${minedcount}`);
-                
+                countSpan.classList.add(`n${minecount}`);
+
                 cell.el.append(countSpan);
             }
+            cell.minecount = minecount
         }
     }
 }
@@ -115,3 +120,43 @@ function randomMineFieldNo(m,n,mineNums) {
     }
     return mines;
 }
+
+function handleClick(rowIdx,colIdx,cells,m,n) {
+    let cell = cells[rowIdx][colIdx];
+    if (cell.mined) {
+
+    } else if (cell.minecount == 0) {
+        spreadSafeField(rowIdx,colIdx,cells,m,n);
+    } else if (cell.minecount > 0) {
+
+    }
+}
+
+
+function spreadSafeField(rowIdx,colIdx,cells,m,n) {
+
+    let cell = cells[rowIdx][colIdx];
+   
+    if (!cell.spreaded) {
+        cell.spreaded = true;
+        cell.el.classList.add("spreaded");    
+    }    
+
+    for (let [drow,dcol] of direction) {
+
+        let newRowIdx = rowIdx + drow, newColIdx = colIdx + dcol;
+        if (newRowIdx < 0 || newRowIdx >= m ||
+            newColIdx < 0 || newColIdx >= n ) {
+            continue
+        }
+        let cell = cells[newRowIdx][newColIdx];
+
+        if (!cell.spreaded && cell.minecount == 0) {
+            spreadSafeField(newRowIdx,newColIdx,cells,m,n)
+        }
+        
+        cell.spreaded = true;
+        cell.el.classList.add("spreaded");
+    } 
+}
+
