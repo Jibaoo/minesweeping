@@ -9,8 +9,16 @@ body {
     background-color: #999;
     width: 15px;
     height: 15px;
-    text-align: center;
+    
 
+}
+
+.mine {
+    text-align: center;
+    font-size: 15px;
+    line-height: 15pt;
+    font-weight: 900;
+    color: brown;
 }
 
 td {
