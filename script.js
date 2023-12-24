@@ -85,6 +85,9 @@ function renderMineField(gameState) {
         cell.el.append(minespan);
     }
     checkAmbedianMineCounts(gameState)
+
+    let messageEl = document.querySelector(".game-info  > .message");
+    messageEl.innerText = "--~少女祈祷中~--"
 }
 
 let direction = [
@@ -125,9 +128,7 @@ function checkAmbedianMineCounts(gameState) {
     }
 }
 
-function randomMineFieldNo(gameState) {
-    
-
+function randomMineFieldNo(gameState) {   
     let mines = [];
     for (let i = 0; i < gameState.mineNums; i++) {
         let fieldNo;
@@ -142,33 +143,73 @@ function randomMineFieldNo(gameState) {
     return mines;
 }
 
+//点击
 function handleClick(rowIdx,colIdx,gameState) {
     if (gameState.timming === null) {
+        startGame(gameState);
+    }
+    //根据周围雷数点开
+    let cell = gameState.cells[rowIdx][colIdx];
+    if (cell.mined) {
+        exploded(gameState,rowIdx,colIdx);
+    } else if (cell.minecount == 0) {
+        spreadSafeField(rowIdx,colIdx,gameState);
+    } else if (cell.minecount > 0) {
+        let cell = gameState.cells[rowIdx][colIdx];   
+        if (!cell.spreaded) {
+            cell.spreaded = true;
+            cell.el.classList.add("spreaded");    
+        }    
+    }
+}
+
+function startGame(gameState) {
+    //第一次点击
+        let messageEl = document.querySelector(".game-info  > .message");
+        messageEl.innerText = "正在玩-扫雷-"
+
         gameState.remaining = gameState.mineNums;
         let remainingEl = document.querySelector(".game-info > .remaining");
         remainingEl.innerHTML = `<span>${gameState.remaining}</span>`;
 
+        //计时
         let timerEl = document.querySelector(".game-info > .timer");
         gameState.timming = 0;
         timerEl.innerHTML = `<span>${gameState.timming}</span>`;
 
-        setInterval(() => {
+        gameState.intervalID = setInterval(() => {
             gameState.timming += 1;
             timerEl.innerText = `${gameState.timming}`;
         }, 1000);
     }
 
-    let cell = gameState.cells[rowIdx][colIdx];
-    if (cell.mined) {
 
-    } else if (cell.minecount == 0) {
-        spreadSafeField(rowIdx,colIdx,gameState);
-    } else if (cell.minecount > 0) {
 
+//爆炸
+function exploded(gameState,rowIdx,colIdx) {
+    for (let rowIdx = 0; rowIdx < gameState.m; rowIdx++) {
+        for (let colIdx = 0; colIdx < gameState.n; colIdx++) {
+            let cell = gameState.cells[rowIdx][colIdx];
+            if (cell.mined) {
+                cell.exploded = true;
+                cell.el.classList.add("exploded");
+            } else {
+                cell.el.classList.add("exploded");
+                cell.el.classList.add("spreaded");
+            }
+        }
     }
+    clearInterval(gameState.intervalID);
+
+    let messageEl = document.querySelector(".game-info  > .message");
+    messageEl.innerText = "满身疮痍GameOver~"
 }
 
+//右键插旗
 function handleFlaging(rowIdx,colIdx,gameState) {
+    if (gameState.timming === null) {
+        startGame(gameState);
+    }
     let cell = gameState.cells[rowIdx][colIdx];
     if (cell.spreaded) {
         return;

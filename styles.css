@@ -12,20 +12,23 @@ body {
     width: 336px;
 }
 
-.game-info > .remaining {
+.game-info > .remaining, .timer {
     width: 5em;
     height: 3ex;
     background-color: azure;
-}
-
-.game-info > .timer {
-    width: 5em;
-    height: 3ex;
-    background-color: azure;
+    text-align: center;
+    line-height: 20pt;
 }
 
 .game-info > .padding {
     flex-grow: 1;
+}
+
+.game-info > .message {
+    width: 10em;
+    font-size: 15px;
+    text-align: center;
+    line-height: 20pt;
 }
 
 .cell {
@@ -113,6 +116,14 @@ span.mine-count.n7 {
     color: #000000;
 }
 
-.spreaded {
+.cell.spreaded {
     background-color: azure;
+}
+
+.cell.exploded {
+    background-color: darkred;
+}
+
+.cell.exploded.spreaded {
+    background-color: darksalmon;
 }
