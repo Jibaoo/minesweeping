@@ -33,7 +33,10 @@ function renderMineField(m,n,mineNums) {
             
             tdEI.append(cellEI);
 
-            rows.push(cellEI);
+            rows.push({
+                mined: false,
+                el: cellEI,
+            });
 
             trEI.append(tdEI);
             
@@ -47,11 +50,52 @@ function renderMineField(m,n,mineNums) {
     for (let cellNo of randomMineFieldNo(m,n,mineNums)) {
         let rowNo = Math.floor(cellNo / n);
         let colNo = cellNo % n;
-        
+
+        let cell = cells[rowNo][colNo];
+        cell.mined = true;
+
         let minespan = document.createElement('span');
         minespan.className = "mine";
         minespan.innerText = "*";
-        cells[rowNo][colNo].append(minespan);
+        cell.el.append(minespan);
+    }
+    checkAmbedianMineCounts(cells,m,n)
+}
+
+let direction = [
+    [-1,-1], [0,-1], [1,-1],
+    [-1,0], [1,0],
+    [-1,1], [0,1], [1,1]
+]
+
+function checkAmbedianMineCounts(cells,m,n) {
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            let cell = cells[i][j];
+            if (cell.mined) {
+                continue
+            }
+            let minedcount = 0;
+            for (let [dx,dy] of direction) {
+                let newRowIdx = i + dx, newColIdx = j + dy;
+                if (newRowIdx < 0 || newRowIdx >= m ||
+                    newColIdx < 0 || newColIdx >= n ) {
+                    continue
+                }
+                if (cells[newRowIdx][newColIdx].mined) {
+                    minedcount += 1;
+                }
+            }
+            if (minedcount > 0) {
+                let countSpan  = document.createElement('span');
+                countSpan.className = "mine-count";
+                countSpan.innerText = `${minedcount}`;
+
+                countSpan.classList.add(`n${minedcount}`);
+                
+                cell.el.append(countSpan);
+            }
+        }
     }
 }
 

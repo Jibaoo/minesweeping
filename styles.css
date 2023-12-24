@@ -1,22 +1,21 @@
 body {
-    
+
     display: flex;
     justify-content: center;
     flex-direction: column;
 }
 
 .cell {
-    background-color: #999;
-    width: 15px;
-    height: 15px;
-    
-
+    background-color: #c0c0c0;
+    width: 21px;
+    height: 21px;
 }
 
-.mine {
+.cell > span.mine {
+    display: inline-block;
     text-align: center;
-    font-size: 15px;
-    line-height: 15pt;
+    font-size: 21px;
+    line-height: 21pt;
     font-weight: 900;
     color: brown;
 }
@@ -53,4 +52,40 @@ td {
     border: solid 1px #aaa;
 }
 
+.cell > span.mine-count {
+    display: inline-block;
+    text-align: center;
+    font-size: 15px;
+
+    font-weight: 900;
+    color: #818181;
+}
+
+span.mine-count.n1 {
+    color: #0003f8;
+}
+
+span.mine-count.n2 {
+    color: #028303;
+}
+
+span.mine-count.n3 {
+    color: #fc0101;
+}
+
+span.mine-count.n4 {
+    color: #000177;
+}
+
+span.mine-count.n5 {
+    color: #800001;
+}
+
+span.mine-count.n6 {
+    color: #007f7f;
+}
+
+span.mine-count.n7 {
+    color: #000000;
+}
 
