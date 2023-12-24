@@ -1,42 +1,56 @@
+let gameState = {
+    m: 9,
+    n: 9,
+    mineNums: 10,
+    remaining: null,
+    timming: null,
+    cells: null,
+}
 
 
 let primary = document.getElementById('primary');
 primary.onclick = function() {
-    renderMineField(9,9,10);
+    renderMineField(gameState);
    
 }
 
 let middle = document.getElementById('middle');
 middle.onclick = function() {
-    renderMineField(16,16,40);
+    gameState.m = 16;
+    gameState.n = 16;
+    gameState.mineNums = 40;
+    renderMineField(gameState);
 
 }
 
 let high = document.getElementById('high');
 high.onclick = function() {
-    renderMineField(16,30,99);
+    gameState.m = 30;
+    gameState.n = 16;
+    gameState.mineNums = 99;
+    renderMineField(gameState);
 }
 
-function renderMineField(m,n,mineNums) {
+function renderMineField(gameState) {
     let tableEI = document.querySelector("#mine-field");
     let cells = [];
     
-    for (let i = 0; i < m; i++) {
+    for (let i = 0; i < gameState.m; i++) {
         let trEI = document.createElement('tr');
         let rows = [];
 
-        for (let j = 0; j < n; j++) {
+        for (let j = 0; j < gameState.n; j++) {
             let tdEI = document.createElement('td');
             let cellEI = document.createElement('div');
             
             cellEI.className = "cell";
 
             cellEI.onclick = function() {
-                handleClick(i,j,cells,m,n);
+                handleClick(i,j,gameState);
             };
             
             cellEI.oncontextmenu = function() {
-                handleFlaging(i,j,cells,m,n);
+                handleFlaging(i,j,gameState);
                 event.stopPropagation();
                 event.preventDefault();
             };
@@ -56,10 +70,11 @@ function renderMineField(m,n,mineNums) {
         tableEI.append(trEI);
 
     }
+    gameState.cells = cells;
 
-    for (let cellNo of randomMineFieldNo(m,n,mineNums)) {
-        let rowNo = Math.floor(cellNo / n);
-        let colNo = cellNo % n;
+    for (let cellNo of randomMineFieldNo(gameState)) {
+        let rowNo = Math.floor(cellNo / gameState.n);
+        let colNo = cellNo % gameState.n;
 
         let cell = cells[rowNo][colNo];
         cell.mined = true;
@@ -69,7 +84,7 @@ function renderMineField(m,n,mineNums) {
         minespan.innerText = "*";
         cell.el.append(minespan);
     }
-    checkAmbedianMineCounts(cells,m,n)
+    checkAmbedianMineCounts(gameState)
 }
 
 let direction = [
@@ -78,21 +93,21 @@ let direction = [
     [-1,1], [0,1], [1,1]
 ]
 
-function checkAmbedianMineCounts(cells,m,n) {
-    for (let rowIdx = 0; rowIdx < m; rowIdx++) {
-        for (let colIdx = 0; colIdx < n; colIdx++) {
-            let cell = cells[rowIdx][colIdx];
+function checkAmbedianMineCounts(gameState) {
+    for (let rowIdx = 0; rowIdx < gameState.m; rowIdx++) {
+        for (let colIdx = 0; colIdx < gameState.n; colIdx++) {
+            let cell = gameState.cells[rowIdx][colIdx];
             if (cell.mined) {
                 continue
             }
             let minecount = 0;
             for (let [drow,dcol] of direction) {
                 let newRowIdx = rowIdx + drow, newColIdx = colIdx + dcol;
-                if (newRowIdx < 0 || newRowIdx >= m ||
-                    newColIdx < 0 || newColIdx >= n ) {
+                if (newRowIdx < 0 || newRowIdx >= gameState.m ||
+                    newColIdx < 0 || newColIdx >= gameState.n ) {
                     continue
                 }
-                if (cells[newRowIdx][newColIdx].mined) {
+                if (gameState.cells[newRowIdx][newColIdx].mined) {
                     minecount += 1;
                 }
             }
@@ -110,14 +125,14 @@ function checkAmbedianMineCounts(cells,m,n) {
     }
 }
 
-function randomMineFieldNo(m,n,mineNums) {
-    console.assert(mineNums <= m * n);
+function randomMineFieldNo(gameState) {
+    
 
     let mines = [];
-    for (let i = 0; i < mineNums; i++) {
+    for (let i = 0; i < gameState.mineNums; i++) {
         let fieldNo;
         while (true) {
-            fieldNo = Math.floor(Math.random() * m * n);
+            fieldNo = Math.floor(Math.random() * gameState.m * gameState.n);
             if (!mines.includes(fieldNo)) {
                 break;
             }
@@ -127,19 +142,19 @@ function randomMineFieldNo(m,n,mineNums) {
     return mines;
 }
 
-function handleClick(rowIdx,colIdx,cells,m,n) {
-    let cell = cells[rowIdx][colIdx];
+function handleClick(rowIdx,colIdx,gameState) {
+    let cell = gameState.cells[rowIdx][colIdx];
     if (cell.mined) {
 
     } else if (cell.minecount == 0) {
-        spreadSafeField(rowIdx,colIdx,cells,m,n);
+        spreadSafeField(rowIdx,colIdx,gameState);
     } else if (cell.minecount > 0) {
 
     }
 }
 
-function handleFlaging(rowIdx,colIdx,cells,m,n) {
-    let cell = cells[rowIdx][colIdx];
+function handleFlaging(rowIdx,colIdx,gameState) {
+    let cell = gameState.cells[rowIdx][colIdx];
     if (cell.spread) {
         return;
     }
@@ -162,9 +177,9 @@ function setFlag(cell,flag) {
     }
 }
 
-function spreadSafeField(rowIdx,colIdx,cells,m,n) {
+function spreadSafeField(rowIdx,colIdx,gameState) {
 
-    let cell = cells[rowIdx][colIdx];
+    let cell = gameState.cells[rowIdx][colIdx];
    
     if (!cell.spreaded) {
         cell.spreaded = true;
@@ -174,14 +189,14 @@ function spreadSafeField(rowIdx,colIdx,cells,m,n) {
     for (let [drow,dcol] of direction) {
 
         let newRowIdx = rowIdx + drow, newColIdx = colIdx + dcol;
-        if (newRowIdx < 0 || newRowIdx >= m ||
-            newColIdx < 0 || newColIdx >= n ) {
+        if (newRowIdx < 0 || newRowIdx >= gameState.m ||
+            newColIdx < 0 || newColIdx >= gameState.n ) {
             continue
         }
-        let cell = cells[newRowIdx][newColIdx];
+        let cell = gameState.cells[newRowIdx][newColIdx];
 
         if (!cell.spreaded && cell.minecount == 0) {
-            spreadSafeField(newRowIdx,newColIdx,cells,m,n)
+            spreadSafeField(newRowIdx,newColIdx,gameState)
         }
         
         cell.spreaded = true;

@@ -1,8 +1,31 @@
 body {
-
+    margin: 0;
+    align-items: center;
     display: flex;
     justify-content: center;
     flex-direction: column;
+}
+
+.game-info {
+    display: flex;
+    background-color: #aaa;
+    width: 336px;
+}
+
+.game-info > .remaining {
+    width: 5em;
+    height: 3ex;
+    background-color: azure;
+}
+
+.game-info > .timer {
+    width: 5em;
+    height: 3ex;
+    background-color: azure;
+}
+
+.game-info > .padding {
+    flex-grow: 1;
 }
 
 .cell {
@@ -31,7 +54,8 @@ td {
     color: white;
     height: 3ex;
     text-align: center;
-    margin: 0 20px;
+    margin: 0;
+    border: solid 2px #818181;
     width: 5em;
     user-select: none;
 }
