@@ -32,42 +32,42 @@ high.onclick = function() {
 }
 
 function renderMineField(gameState) {
-    let tableEI = document.querySelector("#mine-field");
+    let tableEl = document.querySelector("#mine-field");
     let cells = [];
     
     for (let i = 0; i < gameState.m; i++) {
-        let trEI = document.createElement('tr');
+        let trEl = document.createElement('tr');
         let rows = [];
 
         for (let j = 0; j < gameState.n; j++) {
-            let tdEI = document.createElement('td');
-            let cellEI = document.createElement('div');
+            let tdEl = document.createElement('td');
+            let cellEl = document.createElement('div');
             
-            cellEI.className = "cell";
+            cellEl.className = "cell";
 
-            cellEI.onclick = function() {
+            cellEl.onclick = function() {
                 handleClick(i,j,gameState);
             };
             
-            cellEI.oncontextmenu = function() {
+            cellEl.oncontextmenu = function() {
                 handleFlaging(i,j,gameState);
                 event.stopPropagation();
                 event.preventDefault();
             };
 
-            tdEI.append(cellEI);
+            tdEl.append(cellEl);
 
             rows.push({
                 mined: false,
-                el: cellEI,
+                el: cellEl,
             });
 
-            trEI.append(tdEI);
+            trEl.append(tdEl);
             
             
         }
         cells.push(rows);
-        tableEI.append(trEI);
+        tableEl.append(trEl);
 
     }
     gameState.cells = cells;
@@ -143,6 +143,21 @@ function randomMineFieldNo(gameState) {
 }
 
 function handleClick(rowIdx,colIdx,gameState) {
+    if (gameState.timming === null) {
+        gameState.remaining = gameState.mineNums;
+        let remainingEl = document.querySelector(".game-info > .remaining");
+        remainingEl.innerHTML = `<span>${gameState.remaining}</span>`;
+
+        let timerEl = document.querySelector(".game-info > .timer");
+        gameState.timming = 0;
+        timerEl.innerHTML = `<span>${gameState.timming}</span>`;
+
+        setInterval(() => {
+            gameState.timming += 1;
+            timerEl.innerText = `${gameState.timming}`;
+        }, 1000);
+    }
+
     let cell = gameState.cells[rowIdx][colIdx];
     if (cell.mined) {
 
@@ -155,10 +170,18 @@ function handleClick(rowIdx,colIdx,gameState) {
 
 function handleFlaging(rowIdx,colIdx,gameState) {
     let cell = gameState.cells[rowIdx][colIdx];
-    if (cell.spread) {
+    if (cell.spreaded) {
         return;
     }
     setFlag(cell,!cell.flag);
+
+    if (cell.flag) {
+        gameState.remaining -= 1;
+    } else {
+        gameState.remaining += 1;
+    }
+    let remainingEl = document.querySelector(".game-info > .remaining");
+    remainingEl.innerHTML = `<span>${gameState.remaining}</span>`;
 }
 
 function setFlag(cell,flag) {
