@@ -33,8 +33,14 @@ function renderMineField(m,n,mineNums) {
 
             cellEI.onclick = function() {
                 handleClick(i,j,cells,m,n);
-            }
+            };
             
+            cellEI.oncontextmenu = function() {
+                handleFlaging(i,j,cells,m,n);
+                event.stopPropagation();
+                event.preventDefault();
+            };
+
             tdEI.append(cellEI);
 
             rows.push({
@@ -132,6 +138,29 @@ function handleClick(rowIdx,colIdx,cells,m,n) {
     }
 }
 
+function handleFlaging(rowIdx,colIdx,cells,m,n) {
+    let cell = cells[rowIdx][colIdx];
+    if (cell.spread) {
+        return;
+    }
+    setFlag(cell,!cell.flag);
+}
+
+function setFlag(cell,flag) {
+    if (flag) {
+        cell.flag = true;
+        cell.el.innerHTML=`<span class="flag">!</span>`;
+    } else {
+        cell.flag = false;
+        if (cell.mined) {
+            cell.el.innerHTML=`<span class="mine">*</span>`;
+        } else if (cell.minecount > 0) {
+            cell.el.innerHTML = `<span class="mine-count n${cell.minecount}">${cell.minecount}</span>`
+        } else {
+            cell.el.innerHTML = "";
+        }
+    }
+}
 
 function spreadSafeField(rowIdx,colIdx,cells,m,n) {
 
@@ -157,6 +186,10 @@ function spreadSafeField(rowIdx,colIdx,cells,m,n) {
         
         cell.spreaded = true;
         cell.el.classList.add("spreaded");
+
+        if (cell.flag) {
+            setFlag(cell,false);
+        }
     } 
 }
 
