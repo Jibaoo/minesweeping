@@ -1,0 +1,48 @@
+body {
+    
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.cell {
+    background-color: #999;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+
+}
+
+td {
+    padding: 0;
+    border: solid 1px #aaa;
+
+}
+
+.btn {
+    background-color: black;
+    color: white;
+    height: 3ex;
+    text-align: center;
+    margin: 0 20px;
+    width: 5em;
+    user-select: none;
+}
+
+.menu {
+    display: flex;
+    justify-content: center;
+    height: 3ex;
+}
+
+
+
+#mine-field {
+    margin: 10px auto;
+   
+    text-align: center;
+    padding: 0;
+    border: solid 1px #aaa;
+}
+
+
