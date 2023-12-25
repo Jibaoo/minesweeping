@@ -127,3 +127,12 @@ span.mine-count.n7 {
 .cell.exploded.spreaded {
     background-color: darksalmon;
 }
+
+.cell.success {
+    background-color: mediumturquoise;
+}
+
+.cell.success.spreaded {
+    background-color: powderblue;
+}
+

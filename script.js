@@ -151,15 +151,11 @@ function handleClick(rowIdx,colIdx,gameState) {
 
     //点数字周边清雷
     let cell = gameState.cells[rowIdx][colIdx];
-    if (cell.count) {
+    if (cell.count && cell.spreaded) {
         let flagcount = 0;
         checkAmbedianFlagCounts(rowIdx,colIdx,gameState,flagcount)
         //console.log(cell.flagcount)
         if (cell.minecount == cell.flagcount) {
-            if (!cell.spreaded) {
-                cell.spreaded = true;
-                cell.el.classList.add("spreaded");    
-            }    
         
             for (let [drow,dcol] of direction) {
         
@@ -169,6 +165,7 @@ function handleClick(rowIdx,colIdx,gameState) {
                     continue
                 }
                 let cell = gameState.cells[newRowIdx][newColIdx];
+                
                 if (!cell.flag) {
                     cell.spreaded = true;
                     cell.el.classList.add("spreaded");
@@ -191,6 +188,9 @@ function handleClick(rowIdx,colIdx,gameState) {
             cell.el.classList.add("spreaded");    
         }    
     }
+    if (checkSuccess(gameState)) {
+        gameSuccess(gameState);
+    } 
 }
 
 function startGame(gameState) {
@@ -213,8 +213,34 @@ function startGame(gameState) {
         }, 1000);
     }
 
+//判定成功:方块全部打开，或者把雷全部标记出来时
 function checkSuccess(gameState) {
+    let unspreadCount = 0;  
+    let noMarkMine = 0;
+    for (let rowIdx = 0; rowIdx < gameState.m; rowIdx++) {
+        for (let colIdx = 0; colIdx < gameState.n; colIdx++) {
+            let cell = gameState.cells[rowIdx][colIdx];
+            if (cell.flag) {
+                continue;
+            }
+            if (!cell.spreaded) {
+                unspreadCount += 1;
 
+            if (cell.mined) {
+                noMarkMine += 1
+            }
+            }
+        }
+    }
+    console.log(noMarkMine)
+    if (noMarkMine === 0 || gameState.remaining === unspreadCount) {
+        return true;
+    } else {
+        return false;
+    }           
+    //return gameState.remaining === unspreadCount;
+      
+    
 }
 
 //爆炸
@@ -237,7 +263,27 @@ function exploded(gameState,rowIdx,colIdx) {
     messageEl.innerText = "满身疮痍GameOver~"
 }
 
-//右键插旗
+//大成功
+function gameSuccess(gameState) {
+    for (let rowIdx = 0; rowIdx < gameState.m; rowIdx++) {
+        for (let colIdx = 0; colIdx < gameState.n; colIdx++) {
+            let cell = gameState.cells[rowIdx][colIdx];
+            if (cell.mined) {
+                cell.exploded = true;
+                cell.el.classList.add("success");
+            } else {
+                cell.el.classList.add("success");
+                cell.el.classList.add("spreaded");
+            }
+        }
+    }
+    clearInterval(gameState.intervalID);
+
+    let messageEl = document.querySelector(".game-info  > .message");
+    messageEl.innerText = "-- 大成功！--";
+}
+
+//右键插旗 
 function handleFlaging(rowIdx,colIdx,gameState) {
     if (gameState.timming === null) {
         startGame(gameState);
@@ -255,6 +301,10 @@ function handleFlaging(rowIdx,colIdx,gameState) {
     }
     let remainingEl = document.querySelector(".game-info > .remaining");
     remainingEl.innerHTML = `<span>${gameState.remaining}</span>`;
+
+    if (checkSuccess(gameState)) {
+        gameSuccess(gameState);
+    } 
 }
 
 function setFlag(cell,flag) {
