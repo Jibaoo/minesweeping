@@ -5,12 +5,16 @@ let gameState = {
     remaining: null,
     timming: null,
     cells: null,
+    gameOver: false
 }
 
 
 let primary = document.getElementById('primary');
 primary.onclick = function() {
-    renderMineField(gameState);
+    gameState.m = 9;
+    gameState.n = 9;
+    gameState.mineNums = 10;
+    restartField();
    
 }
 
@@ -19,7 +23,7 @@ middle.onclick = function() {
     gameState.m = 16;
     gameState.n = 16;
     gameState.mineNums = 40;
-    renderMineField(gameState);
+    restartField();
 
 }
 
@@ -28,6 +32,17 @@ high.onclick = function() {
     gameState.m = 16;
     gameState.n = 30;
     gameState.mineNums = 99;
+    restartField();
+}
+
+let restart = document.getElementById('restart');
+restart.onclick = function() {
+    restartField();
+}
+
+function restartField() {
+    let tableEl = document.querySelector("#mine-field");
+    tableEl.innerHTML = "";
     renderMineField(gameState);
 }
 
@@ -43,16 +58,26 @@ function renderMineField(gameState) {
             let tdEl = document.createElement('td');
             let cellEl = document.createElement('div');
             
-            cellEl.className = "cell";
+            cellEl.className = "cell unclear";
 
             cellEl.onclick = function() {
+                if (gameState.gameOver) {
+                    return;
+                }            
+
                 handleClick(i,j,gameState);
             };
             
             cellEl.oncontextmenu = function() {
-                handleFlaging(i,j,gameState);
                 event.stopPropagation();
                 event.preventDefault();
+
+                if (gameState.gameOver) {
+                    return;
+                }
+            
+                handleFlaging(gameState,i,j);
+
             };
 
             tdEl.append(cellEl);
@@ -185,7 +210,8 @@ function handleClick(rowIdx,colIdx,gameState) {
         let cell = gameState.cells[rowIdx][colIdx];   
         if (!cell.spreaded) {
             cell.spreaded = true;
-            cell.el.classList.add("spreaded");    
+            cell.el.classList.add("spreaded"); 
+            cell.el.classList.remove("unclear");   
         }    
     }
     if (checkSuccess(gameState)) {
@@ -251,9 +277,11 @@ function exploded(gameState,rowIdx,colIdx) {
             if (cell.mined) {
                 cell.exploded = true;
                 cell.el.classList.add("exploded");
+                cell.el.classList.remove("unclear");
             } else {
                 cell.el.classList.add("exploded");
                 cell.el.classList.add("spreaded");
+                cell.el.classList.remove("unclear");
             }
         }
     }
@@ -261,6 +289,8 @@ function exploded(gameState,rowIdx,colIdx) {
 
     let messageEl = document.querySelector(".game-info  > .message");
     messageEl.innerText = "满身疮痍GameOver~"
+
+    gameState.gameOver = true;
 }
 
 //大成功
@@ -281,6 +311,8 @@ function gameSuccess(gameState) {
 
     let messageEl = document.querySelector(".game-info  > .message");
     messageEl.innerText = "-- 大成功！--";
+
+    gameState.gameOver = true;
 }
 
 //右键插旗 
@@ -330,6 +362,7 @@ function spreadSafeField(rowIdx,colIdx,gameState) {
    
     if (!cell.spreaded) {
         cell.spreaded = true;
+        cell.el.classList.remove("unclear");  
         cell.el.classList.add("spreaded");    
     }    
 
@@ -347,6 +380,7 @@ function spreadSafeField(rowIdx,colIdx,gameState) {
         }
         
         cell.spreaded = true;
+        cell.el.classList.remove("unclear");
         cell.el.classList.add("spreaded");
 
         if (cell.flag) {
@@ -378,3 +412,5 @@ function checkAmbedianFlagCounts(rowIdx,colIdx,gameState,flagcount) {
     cell.flagcount = flagcount;
     //console.log(cell.flagcount) 
 }
+
+renderMineField(gameState);

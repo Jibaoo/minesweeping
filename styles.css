@@ -35,6 +35,16 @@ body {
     background-color: #c0c0c0;
     width: 21px;
     height: 21px;
+
+    border-width: 1.5px;
+    border-style: outset;
+    box-sizing: border-box;
+    border-color: aliceblue;
+}
+
+.cell.unclear > span.mine-count,
+.cell.unclear > span.mine {
+    display: none;
 }
 
 .cell > span.mine {
@@ -118,10 +128,12 @@ span.mine-count.n7 {
 
 .cell.spreaded {
     background-color: azure;
+    border-style: none;
 }
 
 .cell.exploded {
     background-color: darkred;
+    border-style: none;
 }
 
 .cell.exploded.spreaded {
