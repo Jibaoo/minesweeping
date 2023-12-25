@@ -25,8 +25,8 @@ middle.onclick = function() {
 
 let high = document.getElementById('high');
 high.onclick = function() {
-    gameState.m = 30;
-    gameState.n = 16;
+    gameState.m = 16;
+    gameState.n = 30;
     gameState.mineNums = 99;
     renderMineField(gameState);
 }
@@ -62,9 +62,7 @@ function renderMineField(gameState) {
                 el: cellEl,
             });
 
-            trEl.append(tdEl);
-            
-            
+            trEl.append(tdEl);              
         }
         cells.push(rows);
         tableEl.append(trEl);
@@ -96,6 +94,7 @@ let direction = [
     [-1,1], [0,1], [1,1]
 ]
 
+//数字<=周围雷的数量
 function checkAmbedianMineCounts(gameState) {
     for (let rowIdx = 0; rowIdx < gameState.m; rowIdx++) {
         for (let colIdx = 0; colIdx < gameState.n; colIdx++) {
@@ -122,8 +121,9 @@ function checkAmbedianMineCounts(gameState) {
                 countSpan.classList.add(`n${minecount}`);
 
                 cell.el.append(countSpan);
+                cell.count = true;
             }
-            cell.minecount = minecount
+            cell.minecount = minecount;
         }
     }
 }
@@ -148,8 +148,38 @@ function handleClick(rowIdx,colIdx,gameState) {
     if (gameState.timming === null) {
         startGame(gameState);
     }
-    //根据周围雷数点开
+
+    //点数字周边清雷
     let cell = gameState.cells[rowIdx][colIdx];
+    if (cell.count) {
+        let flagcount = 0;
+        checkAmbedianFlagCounts(rowIdx,colIdx,gameState,flagcount)
+        //console.log(cell.flagcount)
+        if (cell.minecount == cell.flagcount) {
+            if (!cell.spreaded) {
+                cell.spreaded = true;
+                cell.el.classList.add("spreaded");    
+            }    
+        
+            for (let [drow,dcol] of direction) {
+        
+                let newRowIdx = rowIdx + drow, newColIdx = colIdx + dcol;
+                if (newRowIdx < 0 || newRowIdx >= gameState.m ||
+                    newColIdx < 0 || newColIdx >= gameState.n ) {
+                    continue
+                }
+                let cell = gameState.cells[newRowIdx][newColIdx];
+                if (!cell.flag) {
+                    cell.spreaded = true;
+                    cell.el.classList.add("spreaded");
+                    if (cell.mined) {
+                        exploded(gameState,rowIdx,colIdx);
+                    }
+                }                
+            }
+        }
+    }
+
     if (cell.mined) {
         exploded(gameState,rowIdx,colIdx);
     } else if (cell.minecount == 0) {
@@ -183,7 +213,9 @@ function startGame(gameState) {
         }, 1000);
     }
 
+function checkSuccess(gameState) {
 
+}
 
 //爆炸
 function exploded(gameState,rowIdx,colIdx) {
@@ -241,6 +273,7 @@ function setFlag(cell,flag) {
     }
 }
 
+//一大片
 function spreadSafeField(rowIdx,colIdx,gameState) {
 
     let cell = gameState.cells[rowIdx][colIdx];
@@ -272,3 +305,26 @@ function spreadSafeField(rowIdx,colIdx,gameState) {
     } 
 }
 
+
+
+
+//点击的数字 的周围插旗数量
+function checkAmbedianFlagCounts(rowIdx,colIdx,gameState,flagcount) {    
+    let cell = gameState.cells[rowIdx][colIdx];
+                    
+        for (let [drow,dcol] of direction) {
+            let newRowIdx = rowIdx + drow, newColIdx = colIdx + dcol;
+            if (newRowIdx < 0 || newRowIdx >= gameState.m ||
+                newColIdx < 0 || newColIdx >= gameState.n ) {
+                continue
+            }
+            if (gameState.cells[newRowIdx][newColIdx].flag) {
+                flagcount += 1
+            }
+        //console.log(flagcount)        
+            
+    }
+    
+    cell.flagcount = flagcount;
+    //console.log(cell.flagcount) 
+}
