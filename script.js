@@ -5,16 +5,15 @@ let gameState = {
     remaining: null,
     timming: null,
     cells: null,
-    gameOver: false
+    gameOver: false,
 }
-
 
 let primary = document.getElementById('primary');
 primary.onclick = function() {
     gameState.m = 9;
     gameState.n = 9;
     gameState.mineNums = 10;
-    restartField();
+    restartField(gameState);
    
 }
 
@@ -23,7 +22,7 @@ middle.onclick = function() {
     gameState.m = 16;
     gameState.n = 16;
     gameState.mineNums = 40;
-    restartField();
+    restartField(gameState);
 
 }
 
@@ -32,17 +31,21 @@ high.onclick = function() {
     gameState.m = 16;
     gameState.n = 30;
     gameState.mineNums = 99;
-    restartField();
+    restartField(gameState);
 }
 
 let restart = document.getElementById('restart');
 restart.onclick = function() {
-    restartField();
+    restartField(gameState);
 }
 
-function restartField() {
+function restartField(gameState) {
     let tableEl = document.querySelector("#mine-field");
     tableEl.innerHTML = "";
+    gameState.timming = null;
+    gameState.remaining = null;
+    gameState.gameOver = false;
+    gameState.cells = null;
     renderMineField(gameState);
 }
 
@@ -76,7 +79,7 @@ function renderMineField(gameState) {
                     return;
                 }
             
-                handleFlaging(gameState,i,j);
+                handleFlaging(i,j,gameState);
 
             };
 
@@ -190,10 +193,15 @@ function handleClick(rowIdx,colIdx,gameState) {
                     continue
                 }
                 let cell = gameState.cells[newRowIdx][newColIdx];
+
+                if (!cell.spreaded && cell.minecount == 0) {
+                    spreadSafeField(newRowIdx,newColIdx,gameState)
+                }
                 
                 if (!cell.flag) {
                     cell.spreaded = true;
                     cell.el.classList.add("spreaded");
+                    cell.el.classList.remove("unclear");
                     if (cell.mined) {
                         exploded(gameState,rowIdx,colIdx);
                     }
@@ -201,7 +209,9 @@ function handleClick(rowIdx,colIdx,gameState) {
             }
         }
     }
-
+    if (cell.flag) {
+        setFlag(cell,!cell.flag);
+    }
     if (cell.mined) {
         exploded(gameState,rowIdx,colIdx);
     } else if (cell.minecount == 0) {
@@ -413,4 +423,4 @@ function checkAmbedianFlagCounts(rowIdx,colIdx,gameState,flagcount) {
     //console.log(cell.flagcount) 
 }
 
-renderMineField(gameState);
+restartField(gameState);

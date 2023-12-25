@@ -8,16 +8,19 @@ body {
 
 .game-info {
     display: flex;
-    background-color: #aaa;
+    background-color: #2C3E4F;
     width: 336px;
+    background: linear-gradient(45deg, #148d82, #d3d39369);
 }
+
 
 .game-info > .remaining, .timer {
     width: 5em;
     height: 3ex;
-    background-color: azure;
+    background-color: #3a88b661;
     text-align: center;
     line-height: 20pt;
+    color: #ffffff;
 }
 
 .game-info > .padding {
@@ -29,17 +32,18 @@ body {
     font-size: 15px;
     text-align: center;
     line-height: 20pt;
+    color: #ffffff;
 }
 
 .cell {
-    background-color: #c0c0c0;
+    background-color: #bfbfbf;
     width: 21px;
     height: 21px;
 
     border-width: 1.5px;
     border-style: outset;
     box-sizing: border-box;
-    border-color: aliceblue;
+    border-color: #e8e8e8;
 }
 
 .cell.unclear > span.mine-count,
@@ -63,14 +67,15 @@ td {
 }
 
 .btn {
-    background-color: black;
+    background-color: #ffd08d;
     color: white;
     height: 3ex;
     text-align: center;
     margin: 0;
-    border: solid 2px #818181;
+    border: solid 2px #ffeeb7;
     width: 5em;
     user-select: none;
+    color: #b24f4f;
 }
 
 .menu {
@@ -82,6 +87,7 @@ td {
 
 
 #mine-field {
+    background-color: #F2F2F2;
     margin: 10px auto;
    
     text-align: center;
@@ -127,24 +133,25 @@ span.mine-count.n7 {
 }
 
 .cell.spreaded {
-    background-color: azure;
+    background-color: #e8e8e8;
     border-style: none;
 }
 
 .cell.exploded {
-    background-color: darkred;
+    background-color: #dea6a4;
     border-style: none;
 }
 
 .cell.exploded.spreaded {
-    background-color: darksalmon;
+    background-color: #efd1d180;
 }
 
 .cell.success {
-    background-color: mediumturquoise;
+    background-color: #7ab0f0;
+    border-color: #e8e8e8;
 }
+
 
 .cell.success.spreaded {
-    background-color: powderblue;
+    background-color: #b4c7dd;
 }
-
